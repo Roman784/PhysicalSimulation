@@ -81,7 +81,7 @@ public class Bird : MonoBehaviour
     private (Vector3, float, Vector3) MoveUniformlyAccelerated(Vector3 startSpeed, Vector3 acceleration, Vector3 startPosition, float time)
     {
         Vector3 speed = startSpeed + acceleration * time;
-        Vector3 position = startPosition + startSpeed * time + acceleration * time * time / 2f;
+        Vector3 position = startPosition + startSpeed * time + acceleration * Mathf.Pow(time, 2) / 2f;
         Vector3 path = position - startPosition;
 
         return (position, CalculatePath(path), speed);
