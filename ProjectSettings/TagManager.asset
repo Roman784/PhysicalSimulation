@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Tree
+    uniqueID: 2515199285
+    locked: 0
+  - name: Bird
+    uniqueID: 3224126729
+    locked: 0
