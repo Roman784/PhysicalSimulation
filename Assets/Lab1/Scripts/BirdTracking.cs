@@ -4,12 +4,11 @@ public class BirdTracking : MonoBehaviour
 {
     [SerializeField] private bool _freezeY;
 
-    private Transform _bird;
+    [SerializeField] private Transform _bird;
     private Vector3 _offset;
 
     private void Start()
     {
-        _bird = Bird.Instance.transform;
         _offset = transform.position - _bird.position;
     }
 

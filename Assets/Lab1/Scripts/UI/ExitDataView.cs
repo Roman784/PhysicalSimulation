@@ -1,3 +1,4 @@
+using Lab3;
 using TMPro;
 using UnityEngine;
 
@@ -5,28 +6,21 @@ public class ExitDataView : MonoBehaviour
 {
     [SerializeField] private TMP_Text _timeView;
     [SerializeField] private TMP_Text _pathView;
-    [SerializeField] private TMP_Text _coordsView;
-    [SerializeField] private TMP_Text _speedView;
+    [SerializeField] private TMP_Text _velocityView;
+    [SerializeField] private TMP_Text _accelerationView;
 
     private void Start()
     {
-        Bird bird = Bird.Instance;
+        BirdLab3 bird = BirdLab3.Instance;
 
-        if (_timeView != null)
-            bird.OnTimeChanged.AddListener(UpdateTimeView);
-
-        if (_pathView != null)
-            bird.OnPathChanged.AddListener(UpdatePathView);
-
-        if (_coordsView != null)
-            bird.OnPositionChanged.AddListener(UpdateCoordsView);
-
-        if (_speedView != null)
-            bird.OnSpeedChanged.AddListener(UpdateSpeedView);
+        bird.OnTimeChanged.AddListener(UpdateTimeView);
+        bird.OnPathChanged.AddListener(UpdatePathView);
+        bird.OnVelocityChanged.AddListener(UpdateVelocityView);
+        bird.OnAccelerationChanged.AddListener(UpdateAccelerationView);
     }
 
     private void UpdateTimeView(float time) => _timeView.text = time.ToString();
     private void UpdatePathView(float path) => _pathView.text = path.ToString();
-    private void UpdateCoordsView(Vector3 coords) => _coordsView.text = coords.ToString();
-    private void UpdateSpeedView(Vector3 speed) => _speedView.text = speed.ToString();
+    private void UpdateVelocityView(Vector2 coords) => _velocityView.text = coords.ToString();
+    private void UpdateAccelerationView(Vector2 speed) => _accelerationView.text = speed.ToString();
 }

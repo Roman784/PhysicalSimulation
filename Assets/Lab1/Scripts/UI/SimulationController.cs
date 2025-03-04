@@ -1,22 +1,17 @@
+using Lab3;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SimulationController : MonoBehaviour
 {
-    [SerializeField] private MoveType _moveType;
-
-    [Space]
-
     [SerializeField] private Button _pauseButton;
     [SerializeField] private Button _resumeButton;
 
-    private Bird _bird;
+    private BirdLab3 _bird;
 
     private void Start()
     {
-        _bird = Bird.Instance;
-
-        _bird.SetMoveType(_moveType);
+        _bird = BirdLab3.Instance;
 
         _pauseButton.onClick.AddListener(PauseSimulation);
         _resumeButton.onClick.AddListener(ResumeSimulation);
@@ -27,7 +22,7 @@ public class SimulationController : MonoBehaviour
     public void ResumeSimulation()
     {
         _bird.SetCanMove(true);
-        
+
         _resumeButton.gameObject.SetActive(false);
         _pauseButton.gameObject.SetActive(true);
     }
