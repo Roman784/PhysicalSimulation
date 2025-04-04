@@ -1,90 +1,81 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class SimulationView : MonoBehaviour
 {
     public static SimulationView Instance;
 
-    [SerializeField] private TMP_InputField _velocityInput1;
-    [SerializeField] private TMP_InputField _velocityInput2;
+    [SerializeField] private TMP_InputField _velocityInput;
+    [SerializeField] private Scrollbar _angleInput;
 
-    [SerializeField] private TMP_Text _velocityView1;
-    [SerializeField] private TMP_Text _velocityView2;
+    [SerializeField] private TMP_Text _velocityView;
 
     [Space]
 
-    [SerializeField] private Ball _ball1;
-    [SerializeField] private Ball _ball2;
+    [SerializeField] private Ball _ball;
 
-    private float _mass1;
-    private float _mass2;
+    [Space]
+
+    [SerializeField] private GameObject _stopButton;
+    [SerializeField] private GameObject _continueButton;
+
+    [Space]
+
+    [SerializeField] private ObstaclesGenerator _obstaclesGenerator;
 
     private void Awake()
     {
         if (Instance != null)
         {
-            Instance.SetBalls(_ball1, _ball2);
             Destroy(gameObject);
             return;
         }
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        _ball.OnVelocityChanged += (velocity) =>
+        {
+            _velocityView.text = $"{velocity} | {(Mathf.Sqrt(velocity.x * velocity.x + velocity.y * velocity.y))}";
+        };
+
+        Stop();
     }
 
-    public void SetBalls(Ball ball1, Ball ball2)
+    public void Launch()
     {
-        if (ball1 == null || ball2 == null) return;
+        var angle = _angleInput.value * 360 * Mathf.Deg2Rad;
+        var direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)).normalized;
+        var velocity = InputUtils.ParseToVector(_velocityInput.text, 1).x * direction;
 
-        _ball1 = ball1;
-        _ball2 = ball2;
-
-        var velocity1 = InputUtils.ParseToVector(_velocityInput1.text, 2);
-        var velocity2 = InputUtils.ParseToVector(_velocityInput2.text, 2);
-
-        _ball1.SetMass(_mass1);
-        _ball1.SetVelocity(velocity1);
-
-        _ball2.SetMass(_mass2);
-        _ball2.SetVelocity(velocity2);
-
-        _velocityView1.text = "0";
-        _velocityView2.text = "0";
-
-        _ball1.OnCollided += (velocity) => _velocityView1.text = velocity.ToString();
-        _ball2.OnCollided += (velocity) => _velocityView2.text = velocity.ToString();
+        _ball.ResetPosition();
+        _ball.SetVelocity(velocity);
     }
 
-    public void SetTask11()
+    public void RotateBallArrow()
     {
-        _mass1 = 1;
-        _mass2 = 1;
-
-        SceneManager.LoadScene("Lab6Task1");
+        var angle = _angleInput.value * 360;
+        _ball.RotateArrow(angle);
     }
 
-    public void SetTask12()
+    public void Stop()
     {
-        _mass1 = 1;
-        _mass2 = 1000;
-
-        SceneManager.LoadScene("Lab6Task1");
+        _ball.SetCanMove(false);
+        _stopButton.SetActive(false);
+        _continueButton.SetActive(true);
     }
 
-    public void SetTask13()
+    public void Continue()
     {
-        _mass1 = 1000;
-        _mass2 = 1;
-
-        SceneManager.LoadScene("Lab6Task1");
+        _ball.SetCanMove(true);
+        _stopButton.SetActive(true);
+        _continueButton.SetActive(false);
     }
 
-    public void SetTask21()
+    public void CreateField()
     {
-        _mass1 = 1;
-        _mass2 = 1;
-
-        SceneManager.LoadScene("Lab6Task2");
+        _obstaclesGenerator.Create();
     }
 }
