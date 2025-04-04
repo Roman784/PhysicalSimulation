@@ -58,6 +58,7 @@ public class SimulationView : MonoBehaviour
     {
         var angle = _angleInput.value * 360;
         _ball.RotateArrow(angle);
+        Launch();
     }
 
     public void Stop()
