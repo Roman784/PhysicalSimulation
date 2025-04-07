@@ -14,7 +14,7 @@ TagManager:
   - UI
   - Obstacle
   - APoint
-  - 
+  - Edge
   - 
   - 
   - 
@@ -47,4 +47,7 @@ TagManager:
     locked: 0
   - name: Bird
     uniqueID: 3224126729
+    locked: 0
+  - name: UI
+    uniqueID: 1227696619
     locked: 0
