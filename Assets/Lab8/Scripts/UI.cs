@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UI : MonoBehaviour
@@ -15,10 +16,14 @@ public class UI : MonoBehaviour
     [SerializeField] private LaserPointer _laserPointer;
     [SerializeField] private EdgesCreator _edgesCreator;
 
+    [Space]
+
+    [SerializeField] private string _nextSceneName;
+
     public void ChangeAngle()
     {
-        var angle = Mathf.Lerp(-90, 90, _angleInput.value);
-        _laserPointer.ChangeAngle(angle);
+        var angle = Mathf.Lerp(-180, 0, _angleInput.value);
+        _laserPointer.ChangeAngle(angle * Mathf.Deg2Rad);
     }
 
     public void ChangeRefractions()
@@ -35,6 +40,11 @@ public class UI : MonoBehaviour
         _edgesCreator.SetCount(count);
         ChangeRefractions();
         ChangeAngle();
+    }
+
+    public void OpenNextScene()
+    {
+        SceneManager.LoadScene(_nextSceneName);
     }
 
     private List<float> ParseToList(string value)

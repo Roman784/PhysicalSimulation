@@ -13,7 +13,7 @@ public class EdgesCreator : MonoBehaviour
     [SerializeField] private Transform _topPoint;
     [SerializeField] private Transform _bottomPoint;
 
-    private List<Edge> _edges = new();
+    [SerializeField] private List<Edge> _edges = new();
 
     public List<Edge> Edges => _edges;
 
@@ -22,13 +22,16 @@ public class EdgesCreator : MonoBehaviour
 
     private void Awake()
     {
-        Create();
+        if (_count > 0)
+            Create();
     }
 
     public void SetCount(int count)
     {
         _count = count;
-        Create();
+
+        if (_count > 0)
+            Create();
     }
 
     [ContextMenu("Create")]
