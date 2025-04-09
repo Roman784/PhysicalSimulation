@@ -10,11 +10,15 @@ public class UI : MonoBehaviour
     [SerializeField] private Scrollbar _angleInput;
     [SerializeField] private TMP_InputField _refractionsInput;
     [SerializeField] private TMP_InputField _envCountInput;
+    [SerializeField] private Scrollbar _positionInput;
+    [SerializeField] private Scrollbar _scaleXInput;
+    [SerializeField] private Scrollbar _scaleYInput;
 
     [Space]
 
     [SerializeField] private LaserPointer _laserPointer;
     [SerializeField] private EdgesCreator _edgesCreator;
+    [SerializeField] private Lens _lens;
 
     [Space]
 
@@ -29,7 +33,9 @@ public class UI : MonoBehaviour
     public void ChangeRefractions()
     {
         var refractions = ParseToList(_refractionsInput.text);
-        _edgesCreator.SetRefraction(refractions);
+        _edgesCreator?.SetRefraction(refractions);
+        if (refractions.Count > 0)
+            _lens?.ChangeRefraction(refractions[0]);
         ChangeAngle();
     }
 
@@ -39,6 +45,22 @@ public class UI : MonoBehaviour
         int count = counts.Count > 0 ? (int)counts[0] : 0;
         _edgesCreator.SetCount(count);
         ChangeRefractions();
+        ChangeAngle();
+    }
+
+    public void ChangeLensPosition()
+    {
+        var x = _positionInput.value * 10 - 5f;
+        _lens.ChangePosition(x);
+        ChangeAngle();
+    }
+
+    public void ChangeLensScale()
+    {
+        var x = _scaleXInput.value * 2;
+        var y = _scaleYInput.value * 2;
+
+        _lens.ChangeScale(new Vector2(x, y));
         ChangeAngle();
     }
 
