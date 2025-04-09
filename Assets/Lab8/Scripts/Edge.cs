@@ -7,12 +7,12 @@ public class Edge : MonoBehaviour
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private Transform _view;
     [SerializeField] private EdgeCollider2D _collider;
-
-    [field: SerializeField] public float Refractive { get; private set; }
+    [SerializeField] private RefractiveObject _refractive;
+    [SerializeField] private RefractiveObject _refractiveAir;
 
     private void Awake()
     {
-        Refractive = 1f;
+        _refractive.Refractive = 1f;
         ChangeColor();
     }
 
@@ -39,6 +39,16 @@ public class Edge : MonoBehaviour
 
     public void SetRefractive(float value)
     {
-        Refractive = value;
+        _refractive.Refractive = value;
+    }
+
+    public void RemoveAir()
+    {
+        _refractiveAir.Refractive = _refractive.Refractive;
+    }
+
+    public void SetAir()
+    {
+        _refractiveAir.Refractive = 1;
     }
 }

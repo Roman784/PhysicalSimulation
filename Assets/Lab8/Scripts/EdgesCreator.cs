@@ -6,7 +6,6 @@ public class EdgesCreator : MonoBehaviour
 {
     [SerializeField] private int _count;
     [SerializeField] private Edge _edgePrefab;
-    [SerializeField] private Edge _airEdge;
 
     [Space]
 
@@ -51,15 +50,6 @@ public class EdgesCreator : MonoBehaviour
         }
     }
 
-    public void EnableColliders()
-    {
-        foreach (var edge in _edges)
-        {
-            edge.SetEnabledCollider(true);
-        }
-        _airEdge.SetEnabledCollider(true);
-    }
-
     public void SetRefraction(List<float> refractions)
     {
         for (int i = 0; i < _edges.Count; i++)
@@ -71,7 +61,11 @@ public class EdgesCreator : MonoBehaviour
                 _edges[i].SetRefractive(refractions[i]);
             else
                 _edges[i].SetRefractive(1);
+
+            if (i < _edges.Count - 1)
+                _edges[i].RemoveAir();
         }
+        _edges[_edges.Count - 1].SetAir();
     }
 
     private void DestroyEdges()

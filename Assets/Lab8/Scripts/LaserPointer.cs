@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEditor.Experimental.GraphView.GraphView;
+using Utils;
 
 public class LaserPointer : MonoBehaviour
 {
@@ -12,19 +8,15 @@ public class LaserPointer : MonoBehaviour
     [SerializeField] private LineRenderer _laser;
     [SerializeField] private LayerMask _layerMask;
     [SerializeField] private LayerMask _airLayerMask;
-    [SerializeField] private EdgesCreator _edgesCreator;
-    [SerializeField] private float _offset;
-    [SerializeField] private Transform _direction;
+    [SerializeField] private Reflaction _reflactionPrefab;
+
+    private ObjectPool<Reflaction> _reflectionsPool;
 
     private void Start()
     {
-        ChangeAngle(-90 * Mathf.Deg2Rad);
-    }
+        _reflectionsPool = new(_reflactionPrefab, 10);
 
-    private void Update()
-    {
-        //Debug.Log(Mathf.Atan2(_direction.right.y, _direction.right.x) * Mathf.Rad2Deg);
-        ChangeAngle(_angle);
+        ChangeAngle(-90 * Mathf.Deg2Rad);
     }
 
     public void ChangeAngle(float value)
@@ -32,6 +24,9 @@ public class LaserPointer : MonoBehaviour
         _angle = value;
 
         transform.rotation = Quaternion.Euler(0f, 0f, _angle * Mathf.Rad2Deg - 90);
+
+        foreach (var reflection in _reflectionsPool.GetInstances())
+            _reflectionsPool.ReleaseInstance(reflection);
 
         _laser.positionCount = 1;
         _laser.SetPosition(0, _startLaserPoint.position);
@@ -41,7 +36,7 @@ public class LaserPointer : MonoBehaviour
 
     private void ContinueLaser(Vector2 startPos, float angle, LayerMask layerMask, float prevRefractive)
     {
-        if (_laser.positionCount > 10) return;
+        if (_laser.positionCount > 15) return;
         _laser.positionCount += 1;
 
         var direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
@@ -56,15 +51,16 @@ public class LaserPointer : MonoBehaviour
             if (refractive >= 1)
             {
                 var normal = hit.normal;
-                var angleNorDir = Vector2.Angle(-direction, normal) * Mathf.Deg2Rad;
-                var normalAngle = Vector2.Angle(normal, Vector2.right) * Mathf.Deg2Rad;
-                var sinTheta2 = Mathf.Sin(angleNorDir) * prevRefractive / refractive;
+                var angleBetweenNormalAndDirection = Vector2.Angle(-direction, normal) * Mathf.Deg2Rad;
+                var sin = Mathf.Sin(angleBetweenNormalAndDirection) * prevRefractive / refractive;
 
-                if (Mathf.Abs(sinTheta2) > 1) return;
+                if (Mathf.Abs(sin) > 1)
+                {
+                    CreateReflection(hit, direction);
+                    return;
+                }
 
-                var newAngle = Mathf.Asin(sinTheta2);
-
-                Debug.Log($"dir: {direction} | nor: {normal}");
+                var newAngle = Mathf.Asin(sin);
 
                 newAngle *= Sign(direction, normal);
                 newAngle += Mathf.Atan2(-normal.y, -normal.x);
@@ -76,6 +72,18 @@ public class LaserPointer : MonoBehaviour
         else
         {
             _laser.SetPosition(_laser.positionCount - 1, startPos + direction * 100);
+        }
+    }
+
+    private void CreateReflection(RaycastHit2D rayHit, Vector2 rayDirection)
+    {
+        var direction = Vector2.Reflect(rayDirection, rayHit.normal);
+        var startPosition = rayHit.point + direction * 0.1f;
+
+        RaycastHit2D hit = Physics2D.Raycast(startPosition, direction, 100, _airLayerMask);
+        if (hit.collider != null)
+        {
+            _reflectionsPool.GetInstance().ThrowRay(rayHit.point, hit.point);
         }
     }
 
