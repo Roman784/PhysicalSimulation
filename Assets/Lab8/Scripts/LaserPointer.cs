@@ -36,7 +36,7 @@ public class LaserPointer : MonoBehaviour
 
     private void ContinueLaser(Vector2 startPos, float angle, LayerMask layerMask, float prevRefractive)
     {
-        if (_laser.positionCount > 15) return;
+        if (_laser.positionCount > 30) return;
         _laser.positionCount += 1;
 
         var direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
@@ -47,6 +47,24 @@ public class LaserPointer : MonoBehaviour
         {
             _laser.SetPosition(_laser.positionCount - 1, hit.point);
 
+            // Конечная точка.
+            if (hit.collider.tag == "APoint")
+                return;
+
+            // Отражение.
+            if (hit.collider.tag == "Mirrow")
+            {
+                var normal = hit.normal;
+                var angleBetweenNormalAndDirection = Vector2.Angle(-direction, normal) * Mathf.Deg2Rad;
+                var normalAngle = Mathf.Atan2(normal.y, normal.x);
+                var newAngle = normalAngle + angleBetweenNormalAndDirection * -Sign(direction, normal);
+                Debug.DrawRay(hit.point, normal);
+
+                ContinueLaser(hit.point, newAngle, _layerMask, 1f);
+                return;
+            }
+
+            // Преломление.
             var refractive = hit.collider.GetComponent<RefractiveObject>()?.Refractive ?? 1f;
             if (refractive >= 1)
             {
@@ -56,7 +74,8 @@ public class LaserPointer : MonoBehaviour
 
                 if (Mathf.Abs(sin) > 1)
                 {
-                    CreateReflection(hit, direction);
+                    // Полное внутреннее.
+                    CreateReflection(hit, direction, 0);
                     return;
                 }
 
@@ -75,8 +94,11 @@ public class LaserPointer : MonoBehaviour
         }
     }
 
-    private void CreateReflection(RaycastHit2D rayHit, Vector2 rayDirection)
+    private void CreateReflection(RaycastHit2D rayHit, Vector2 rayDirection, int i)
     {
+        if (i > 1) return;
+        i += 1;
+
         var direction = Vector2.Reflect(rayDirection, rayHit.normal);
         var startPosition = rayHit.point + direction * 0.1f;
 
@@ -84,6 +106,7 @@ public class LaserPointer : MonoBehaviour
         if (hit.collider != null)
         {
             _reflectionsPool.GetInstance().ThrowRay(rayHit.point, hit.point);
+            CreateReflection(hit, direction, i);
         }
     }
 

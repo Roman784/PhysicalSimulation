@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Lens : MonoBehaviour
 {
     [SerializeField] private RefractiveObject _refractive;
+    [SerializeField] private TMP_Text _refractiveView;
 
     public void ChangeScale(Vector2 scale)
     {
@@ -20,5 +22,6 @@ public class Lens : MonoBehaviour
     public void ChangeRefraction(float refraction)
     {
         _refractive.Refractive = refraction;
+        _refractiveView.text = $"{refraction:F1}";
     }
 }

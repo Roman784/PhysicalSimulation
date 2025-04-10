@@ -6,21 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Lab3/Lab3.unity
-    guid: eaf78b9a5c82d8047bd0ca91124b7cdd
-  - enabled: 0
-    path: Assets/Lab6/Scenes/Lab6Boot.unity
-    guid: ce5f13e99541f9249b0ec418669f956b
-  - enabled: 1
     path: Assets/Lab8/Lab8Part1.unity
     guid: dde7373be632cb64dbff487c8bd57912
   - enabled: 0
-    path: Assets/Lab6/Scenes/Lab6Task1.unity
-    guid: a3f7efe0eec261443971ca60f80ac327
-  - enabled: 0
-    path: Assets/Lab6/Scenes/Lab6Task2.unity
-    guid: c3df17c47437a3e478720bcb5aacfb33
-  - enabled: 1
     path: Assets/Lab8/Lab8Part2.unity
     guid: b6dcee33332231843ac75da4f30ddfc5
+  - enabled: 1
+    path: Assets/Lab8/Lab8-2.unity
+    guid: 056c9ee622e02a745a9bd019aa70ef66
   m_configObjects: {}

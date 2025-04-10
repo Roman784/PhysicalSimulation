@@ -19,14 +19,20 @@ public class UI : MonoBehaviour
     [SerializeField] private LaserPointer _laserPointer;
     [SerializeField] private EdgesCreator _edgesCreator;
     [SerializeField] private Lens _lens;
+    [SerializeField] private FieldCreator _fieldCreator;
 
     [Space]
 
     [SerializeField] private string _nextSceneName;
 
+    private void Start()
+    {
+        ChangeAngle();
+    }
+
     public void ChangeAngle()
     {
-        var angle = Mathf.Lerp(-180, 0, _angleInput.value);
+        var angle = Mathf.Lerp(-270, 270, _angleInput.value);
         _laserPointer.ChangeAngle(angle * Mathf.Deg2Rad);
     }
 
@@ -61,6 +67,12 @@ public class UI : MonoBehaviour
         var y = _scaleYInput.value * 2;
 
         _lens.ChangeScale(new Vector2(x, y));
+        ChangeAngle();
+    }
+
+    public void CreateField()
+    {
+        _fieldCreator.Create();
         ChangeAngle();
     }
 

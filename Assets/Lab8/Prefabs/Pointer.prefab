@@ -271,7 +271,7 @@ MonoBehaviour:
   _laser: {fileID: 3517325100577036060}
   _layerMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 384
   _airLayerMask:
     serializedVersion: 2
     m_Bits: 512
