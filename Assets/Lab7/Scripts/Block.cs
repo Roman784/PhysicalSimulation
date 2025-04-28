@@ -10,27 +10,22 @@ public class Block : MonoBehaviour
     public float Mu;
     public float Angle;
 
-    [SerializeField] private LayerMask _platformLayer;
+    [SerializeField] protected LayerMask _platformLayer;
 
-    private float _time;
+    protected float _time;
 
-    private Vector3 _velocity;
-    private bool _canMove;
+    protected Vector3 _velocity;
+    [SerializeField] protected bool _canMove = false;
 
-    private Coroutine _moveRoutine;
+    protected Coroutine _moveRoutine;
 
     public bool CanMove => _canMove;
 
-    public float Time_ { get; private set; }
-    public float Force { get; private set; }
-    public Vector3 Velocity { get; private set; }
-    public float A { get; private set; }
-    public float Friction { get; private set; }
-
-    private void Awake()
-    {
-        _canMove = false;
-    }
+    public float Time_ { get; protected set; }
+    public float Force { get; protected set; }
+    public Vector3 Velocity { get; protected set; }
+    public float A { get; protected set; }
+    public float Friction { get; protected set; }
 
     public void Restart()
     {
@@ -40,7 +35,7 @@ public class Block : MonoBehaviour
         _velocity = Vector3.zero;
         _time = 0f;
         _canMove = true;
-        _moveRoutine = StartCoroutine(Move());
+        _moveRoutine = StartCoroutine(MoveRoutine());
     }
 
     public void SetCanMove(bool value)
@@ -48,44 +43,55 @@ public class Block : MonoBehaviour
         _canMove = value;
     }
 
-    private IEnumerator Move()
+    protected IEnumerator MoveRoutine()
     {
         while (true)
         {
             yield return null;
 
-            if (!_canMove) continue;
-
-            float force = InitialForce + Acceleration * _time;
-
-            float mu = 1;
-            RaycastHit[] hit = Physics.RaycastAll(transform.position, -transform.up, 10, _platformLayer);
-            if (hit.Length > 0) mu = hit[0].collider.GetComponent<Platform>().Mu;
-
-            float angleRad = Angle * Mathf.Deg2Rad;
-            float g = 9.81f;
-            float N = Mass * g * Mathf.Cos(angleRad);
-            float gravityForce = Mass * g * Mathf.Sin(angleRad);
-            float frictionForce = mu * N;
-
-            force -= gravityForce;
-            float resForce = force - frictionForce * Mathf.Sign(force);
-
-            float a = resForce / Mass;
-
-            if (force < 0 && a > 0 && _velocity.x > 0) continue;
-            if (force > 0 && a < 0 && _velocity.x < 0) continue;
-
-            _velocity += transform.right * a * Time.deltaTime;
-            transform.position += _velocity * Time.deltaTime;
-
-            _time += Time.deltaTime;
-
-            Time_ = _time;
-            Force = force;
-            Friction = frictionForce;
-            A = a;
-            Velocity = _velocity;
+            Move();
         }
+    }
+
+    protected virtual void Move()
+    {
+        if (!_canMove || Mass <= 0) return;
+
+        float force = InitialForce + Acceleration * _time;
+
+        float mu = 1;
+        RaycastHit[] hit = Physics.RaycastAll(transform.position, -transform.up, 10, _platformLayer);
+        if (hit.Length > 0) mu = hit[0].collider.GetComponent<Platform>().Mu;
+
+        float angleRad = Angle * Mathf.Deg2Rad;
+        float g = 9.81f;
+        float N = Mass * g * Mathf.Cos(angleRad);
+        float gravityForce = Mass * g * Mathf.Sin(angleRad);
+        float frictionForce = mu * N;
+
+        force -= gravityForce;
+        float resForce = force - frictionForce * Mathf.Sign(force);
+
+        float a = resForce / Mass;
+
+        if (force < 0 && a > 0 && _velocity.x >= 0 || force > 0 && a < 0 && _velocity.x <= 0)
+        {
+            Debug.Log("1");
+            _velocity = Vector3.zero;
+        }
+        else
+        {
+            Debug.Log("2");
+            _velocity += transform.right * a * Time.deltaTime;
+        }
+
+        transform.position += _velocity * Time.deltaTime;
+        _time += Time.deltaTime;
+
+        Time_ = _time;
+        Force = force;
+        Friction = frictionForce;
+        A = a;
+        Velocity = _velocity;
     }
 }

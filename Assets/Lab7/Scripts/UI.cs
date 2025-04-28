@@ -1,6 +1,7 @@
 
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIView : MonoBehaviour
@@ -29,10 +30,16 @@ public class UIView : MonoBehaviour
 
     [SerializeField] private Transform _blockPos1;
     [SerializeField] private Transform _blockPos2;
+    [SerializeField] private Transform _block2Pos;
 
     [Space]
 
     [SerializeField] private Block _block;
+    [SerializeField] private Block _block2;
+
+    [Space]
+
+    [SerializeField] private Vector2 _angleBorder = new Vector2(0, 60);
 
     private void Start()
     {
@@ -51,21 +58,23 @@ public class UIView : MonoBehaviour
 
     public void ChangeValue()
     {
-        var angle = Mathf.Lerp(0, 60, _angle.value);
+        var angle = Mathf.Lerp(_angleBorder.x, _angleBorder.y, _angle.value);
 
         _block.Angle = angle;
-        _block.Mass = InputUtils.ParseToVector(_mass.text, 1).x;
+        _block.Mass = InputUtils.ParseToVector(_mass.text, 2).x;
+        if (_block2 != null) _block2.Mass = InputUtils.ParseToVector(_mass.text, 2).y;
         _block.InitialForce = InputUtils.ParseToVector(_force.text, 1).x;
         _block.Acceleration = InputUtils.ParseToVector(_a.text, 1).x;
 
         _platformRoot.rotation = Quaternion.Euler(0, 0, angle);
         _platform1.Mu = InputUtils.ParseToVector(_mu.text, 2).x;
-        _platform2.Mu = InputUtils.ParseToVector(_mu.text, 2).y;
+        if (_platform2 != null) _platform2.Mu = InputUtils.ParseToVector(_mu.text, 2).y;
 
         _block.transform.rotation = Quaternion.Euler(0, 0, angle);
         _block.transform.position = _blockPos1.position;
 
         _block.SetCanMove(false);
+        _block2?.SetCanMove(false);
     }
 
     public void StopCon()
@@ -76,12 +85,19 @@ public class UIView : MonoBehaviour
     public void SetPos1()
     {
         _block.transform.position = _blockPos1.position;
+        if (_block2 != null) _block2.transform.position = _block2Pos.position;
         _block.Restart();
+        _block2?.Restart();
     }
 
     public void SetPos2()
     {
         _block.transform.position = _blockPos2.position;
         _block.Restart();
+    }
+
+    public void OpenScene(string name)
+    {
+        SceneManager.LoadScene(name);
     }
 }
